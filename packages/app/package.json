@@ -10,14 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dust/world": "https://pkg.pr.new/dustproject/dust/@dust/world@b5c12b4",
+    "@dust/world": "https://pkg.pr.new/dustproject/dust/@dust/world@e692ae0",
     "@latticexyz/common": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
     "@latticexyz/stash": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
     "@latticexyz/store-sync": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
     "@latticexyz/world": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
     "@tanstack/react-query": "^5.83.0",
     "contracts": "workspace:*",
-    "dustkit": "https://pkg.pr.new/dustproject/dust/dustkit@b5c12b4",
+    "dustkit": "https://pkg.pr.new/dustproject/dust/dustkit@e692ae0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "viem": "2.35.1"
