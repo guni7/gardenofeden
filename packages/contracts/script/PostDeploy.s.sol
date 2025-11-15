@@ -7,18 +7,19 @@ import { console } from "forge-std/console.sol";
 import { Script } from "./Script.sol";
 
 import { bedProgram } from "../src/codegen/systems/BedProgramLib.sol";
-
-import { chestCounterProgram } from "../src/codegen/systems/ChestCounterProgramLib.sol";
-import { chestProgram } from "../src/codegen/systems/ChestProgramLib.sol";
-import { forceFieldProgram } from "../src/codegen/systems/ForceFieldProgramLib.sol";
+import { fFProgram } from "../src/codegen/systems/FFProgramLib.sol";
 import { spawnTileProgram } from "../src/codegen/systems/SpawnTileProgramLib.sol";
+import { Admin } from "../src/codegen/tables/Admin.sol";
 
 contract PostDeploy is Script {
   function run(address worldAddress) external {
     StoreSwitch.setStoreAddress(worldAddress);
     startBroadcast();
 
-    // do something
+    // Set the admin address
+    address admin = 0xD6756447ea6325b90917f604324B52ccfd6a1e0a;
+    Admin.set(admin, true);
+    console.log("Set admin address:", admin);
 
     vm.stopBroadcast();
 
@@ -32,10 +33,8 @@ contract PostDeploy is Script {
   function _setLocalWorldAddress(address worldAddress) internal {
     bytes32 worldSlot = keccak256("mud.store.storage.StoreSwitch");
     bytes32 worldAddressBytes32 = bytes32(uint256(uint160(worldAddress)));
-    vm.store(forceFieldProgram.getAddress(), worldSlot, worldAddressBytes32);
+    vm.store(fFProgram.getAddress(), worldSlot, worldAddressBytes32);
     vm.store(spawnTileProgram.getAddress(), worldSlot, worldAddressBytes32);
     vm.store(bedProgram.getAddress(), worldSlot, worldAddressBytes32);
-    vm.store(chestProgram.getAddress(), worldSlot, worldAddressBytes32);
-    vm.store(chestCounterProgram.getAddress(), worldSlot, worldAddressBytes32);
   }
 }

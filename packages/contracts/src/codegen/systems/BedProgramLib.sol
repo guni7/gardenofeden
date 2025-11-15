@@ -15,9 +15,9 @@ import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
 type BedProgramType is bytes32;
 
-// equivalent to WorldResourceIdLib.encode({ typeId: RESOURCE_SYSTEM, namespace: "template", name: "BedProgram" }))
+// equivalent to WorldResourceIdLib.encode({ typeId: RESOURCE_SYSTEM, namespace: "GardenOfEden", name: "BedProgram" }))
 BedProgramType constant bedProgram = BedProgramType.wrap(
-  0x737974656d706c61746500000000000042656450726f6772616d000000000000
+  0x737947617264656e4f664564656e000042656450726f6772616d000000000000
 );
 
 struct CallWrapper {

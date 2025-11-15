@@ -17,16 +17,12 @@ contract RegisterApp is Script {
 
         startBroadcast();
 
-        ResourceId appNamespaceId = WorldResourceIdLib.encodeNamespace("my_namespace");
-        string memory appUrl = "https://example.com/dust-app.json";
+        ResourceId appNamespaceId = WorldResourceIdLib.encodeNamespace("GardenOfEden");
+        string memory appUrl = "https://gardenofeden-app-s59f.vercel.app/dust-app.json";
         console.log("Registering app with url: %s", appUrl);
+        metadataSystem.setResourceTag(appNamespaceId, "dust.appConfigUrl", bytes(appUrl));
 
-        revert("Remove this revert from script/RegisterApp.s.sol and uncomment the setResourceTag calls that you need");
-        // NOTE: uncomment this to register as a global app (sidebar apps)
-        // metadataSystem.setResourceTag(appNamespaceId, "dust.appConfigUrl", bytes(appUrl));
-
-        // NOTE: uncomment this to register as a spawn app (appears when user is choosing how to spawn)
-        // metadataSystem.setResourceTag(appNamespaceId, "dust.spawnAppConfigUrl", bytes(appUrl));
+        metadataSystem.setResourceTag(appNamespaceId, "dust.spawnAppConfigUrl", bytes(appUrl));
 
         vm.stopBroadcast();
     }

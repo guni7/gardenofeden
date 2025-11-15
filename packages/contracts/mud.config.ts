@@ -23,9 +23,9 @@ export default defineWorld({
     },
   },
   // Replace this with a unique namespace
-  namespace: "template",
+  namespace: "GardenOfEden",
   systems: {
-    ForceFieldProgram: {
+    FFProgram: {
       openAccess: false,
       deploy: { registerWorldFunctions: false },
     },
@@ -33,28 +33,40 @@ export default defineWorld({
       openAccess: false,
       deploy: { registerWorldFunctions: false },
     },
-    ChestProgram: {
-      openAccess: false,
-      deploy: { registerWorldFunctions: false },
-    },
     BedProgram: {
       openAccess: false,
       deploy: { registerWorldFunctions: false },
     },
-    CounterSystem: {
+    EdenTokenSystem: {
+      openAccess: false,
       deploy: { registerWorldFunctions: false },
     },
-    ChestCounterProgram: {
-      openAccess: false,
+    AdminSystem: {
+      openAccess: true,
       deploy: { registerWorldFunctions: false },
     },
   },
   tables: {
-    Counter: {
+    Admin: {
       schema: {
-        value: "uint256",
+        admin: "address",
+        isAdmin: "bool",
       },
-      key: [],
+      key: ["admin"],
+    },
+    SpawnCount: {
+      schema: {
+        player: "address",
+        count: "uint32",
+      },
+      key: ["player"],
+    },
+    FruitOfEden: {
+      schema: {
+        player: "address",
+        karma: "int256",
+      },
+      key: ["player"],
     },
   },
 });

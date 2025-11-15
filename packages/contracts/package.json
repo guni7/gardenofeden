@@ -26,7 +26,8 @@
     "@latticexyz/world": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
     "@latticexyz/world-consumer": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
     "@latticexyz/world-module-metadata": "2.2.23-84b8926b9c97fd6d0807aa5b84326fe9a698f264",
-    "@openzeppelin/contracts": "^4.9.6",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@openzeppelin/contracts-upgradeable": "^5.4.0",
     "solady": "^0.1.14"
   },
   "devDependencies": {

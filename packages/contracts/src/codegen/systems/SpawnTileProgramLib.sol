@@ -15,9 +15,9 @@ import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
 type SpawnTileProgramType is bytes32;
 
-// equivalent to WorldResourceIdLib.encode({ typeId: RESOURCE_SYSTEM, namespace: "template", name: "SpawnTileProgram" }))
+// equivalent to WorldResourceIdLib.encode({ typeId: RESOURCE_SYSTEM, namespace: "GardenOfEden", name: "SpawnTileProgram" }))
 SpawnTileProgramType constant spawnTileProgram = SpawnTileProgramType.wrap(
-  0x737974656d706c617465000000000000537061776e54696c6550726f6772616d
+  0x737947617264656e4f664564656e0000537061776e54696c6550726f6772616d
 );
 
 struct CallWrapper {
@@ -38,8 +38,8 @@ struct RootCallWrapper {
 library SpawnTileProgramLib {
   error SpawnTileProgramLib_CallingFromRootSystem();
 
-  function onSpawn(SpawnTileProgramType self, HookContext memory ctx, ISpawn.SpawnData memory __auxArg0) internal {
-    return CallWrapper(self.toResourceId(), address(0)).onSpawn(ctx, __auxArg0);
+  function onSpawn(SpawnTileProgramType self, HookContext memory ctx, ISpawn.SpawnData memory spawn) internal {
+    return CallWrapper(self.toResourceId(), address(0)).onSpawn(ctx, spawn);
   }
 
   function _msgSender(SpawnTileProgramType self) internal view returns (address __auxRet0) {
@@ -50,11 +50,11 @@ library SpawnTileProgramLib {
     return CallWrapper(self.toResourceId(), address(0))._msgValue();
   }
 
-  function onSpawn(CallWrapper memory self, HookContext memory ctx, ISpawn.SpawnData memory __auxArg0) internal {
+  function onSpawn(CallWrapper memory self, HookContext memory ctx, ISpawn.SpawnData memory spawn) internal {
     // if the contract calling this function is a root system, it should use `callAsRoot`
     if (address(_world()) == address(this)) revert SpawnTileProgramLib_CallingFromRootSystem();
 
-    bytes memory systemCall = abi.encodeCall(_onSpawn_HookContext_ISpawn_SpawnData.onSpawn, (ctx, __auxArg0));
+    bytes memory systemCall = abi.encodeCall(_onSpawn_HookContext_ISpawn_SpawnData.onSpawn, (ctx, spawn));
     self.from == address(0)
       ? _world().call(self.systemId, systemCall)
       : _world().callFrom(self.from, self.systemId, systemCall);
@@ -96,8 +96,8 @@ library SpawnTileProgramLib {
     }
   }
 
-  function onSpawn(RootCallWrapper memory self, HookContext memory ctx, ISpawn.SpawnData memory __auxArg0) internal {
-    bytes memory systemCall = abi.encodeCall(_onSpawn_HookContext_ISpawn_SpawnData.onSpawn, (ctx, __auxArg0));
+  function onSpawn(RootCallWrapper memory self, HookContext memory ctx, ISpawn.SpawnData memory spawn) internal {
+    bytes memory systemCall = abi.encodeCall(_onSpawn_HookContext_ISpawn_SpawnData.onSpawn, (ctx, spawn));
     SystemCall.callWithHooksOrRevert(self.from, self.systemId, systemCall, msg.value);
   }
 
@@ -160,7 +160,7 @@ library SpawnTileProgramLib {
  */
 
 interface _onSpawn_HookContext_ISpawn_SpawnData {
-  function onSpawn(HookContext memory ctx, ISpawn.SpawnData memory __auxArg0) external;
+  function onSpawn(HookContext memory ctx, ISpawn.SpawnData memory spawn) external;
 }
 
 interface __msgSender {
