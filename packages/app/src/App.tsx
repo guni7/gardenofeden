@@ -1,6 +1,7 @@
 import { usePlayerStatus } from "./common/usePlayerStatus";
 import { useSyncStatus } from "./mud/useSyncStatus";
 import { useDustClient } from "./common/useDustClient";
+import GardenOfEden from "./components/GardenOfEden";
 
 export default function App() {
   const { data: dustClient } = useDustClient();
@@ -29,9 +30,5 @@ export default function App() {
     );
   }
 
-  return (
-    <div>
-  
-    </div>
-  );
+  return <GardenOfEden />;
 }
