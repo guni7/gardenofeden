@@ -12,7 +12,7 @@ export default function GardenOfEden() {
 
     ctx.imageSmoothingEnabled = false;
 
-    const DEFAULT_CELL_SIZE = 48;
+    const DEFAULT_CELL_SIZE = 32;
     const DEFAULT_DENSITY = 0.18;
     const DEFAULT_FPS = 8;
 
@@ -71,14 +71,16 @@ export default function GardenOfEden() {
     };
 
     const render = () => {
-      ctx.fillStyle = '#000010';
+      // Minecraft Programmer Art sky blue background
+      ctx.fillStyle = '#7FA1FF';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const grassBase = '#3caa3e';
-      const dirtSideTop = '#7a5330';
-      const dirtSideMid = '#614126';
-      const dirtSideBottom = '#4e341e';
-      const depth = Math.max(4, Math.floor(cellSize * 0.9));
+      // Minecraft Programmer Art grass block colors
+      const grassTop = '#7CBD6B';
+      const dirtSideTop = '#96683B';
+      const dirtSideMid = '#8B5A2B';
+      const dirtSideBottom = '#7A4F1F';
+      const depth = Math.max(4, Math.floor(cellSize * 0.7));
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
@@ -86,15 +88,27 @@ export default function GardenOfEden() {
           const px = x * cellSize;
           const py = y * cellSize;
 
-          ctx.fillStyle = grassBase;
+          // Draw grass top (bright green)
+          ctx.fillStyle = grassTop;
           ctx.fillRect(px, py, cellSize, cellSize);
 
+          // Add slight texture variation to grass
+          ctx.fillStyle = 'rgba(106, 168, 79, 0.3)';
+          ctx.fillRect(px, py, cellSize / 2, cellSize / 2);
+          ctx.fillRect(px + cellSize / 2, py + cellSize / 2, cellSize / 2, cellSize / 2);
+
+          // Draw dirt side with gradient
           const g = ctx.createLinearGradient(0, py + cellSize, 0, py + cellSize + depth);
           g.addColorStop(0, dirtSideTop);
-          g.addColorStop(0.6, dirtSideMid);
+          g.addColorStop(0.5, dirtSideMid);
           g.addColorStop(1, dirtSideBottom);
           ctx.fillStyle = g;
           ctx.fillRect(px, py + cellSize, cellSize, depth);
+
+          // Add block outline for that classic Minecraft look
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(px, py, cellSize, cellSize);
         }
       }
     };
@@ -141,10 +155,9 @@ export default function GardenOfEden() {
           inset: 0;
           width: 100vw;
           height: 100vh;
-          background: #000;
+          background: #7FA1FF;
           display: block;
           z-index: 0;
-          opacity: 0.6;
         }
 
         .garden-content {
@@ -155,83 +168,52 @@ export default function GardenOfEden() {
           align-items: center;
           justify-content: center;
           text-align: center;
+          padding: 1rem;
         }
 
         .garden-title {
-          font-family: 'Cinzel', serif;
-          font-weight: 900;
-          font-size: clamp(3rem, 2.5rem + 4vw, 6.5rem);
+          font-family: 'Minecraft', 'Cinzel', serif;
+          font-weight: 700;
+          font-size: clamp(2rem, 5vw, 3.5rem);
           margin: 0;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.05em;
           text-transform: uppercase;
-          color: #fff;
+          color: #FFFFFF;
           text-align: center;
           text-shadow:
-            0 0 10px rgba(255, 215, 0, 0.8),
-            0 0 20px rgba(255, 215, 0, 0.6),
-            0 0 30px rgba(255, 215, 0, 0.4),
-            0 5px 0 #0b2a0b,
-            0 8px 0 #0b2a0b,
-            0 11px 0 #0b2a0b,
-            0 14px 0 #0b2a0b,
-            0 18px 25px rgba(0,0,0,0.8),
-            0 0 40px rgba(0, 255, 225, 0.3);
-          line-height: 1.3;
-          animation: titlePulse 3s ease-in-out infinite;
+            3px 3px 0 #3F3F3F,
+            0 0 10px rgba(255, 255, 255, 0.5);
+          line-height: 1.4;
+          max-width: 90%;
         }
 
-        @keyframes titlePulse {
-          0%, 100% {
-            text-shadow:
-              0 0 10px rgba(255, 215, 0, 0.8),
-              0 0 20px rgba(255, 215, 0, 0.6),
-              0 0 30px rgba(255, 215, 0, 0.4),
-              0 5px 0 #0b2a0b,
-              0 8px 0 #0b2a0b,
-              0 11px 0 #0b2a0b,
-              0 14px 0 #0b2a0b,
-              0 18px 25px rgba(0,0,0,0.8),
-              0 0 40px rgba(0, 255, 225, 0.3);
-          }
-          50% {
-            text-shadow:
-              0 0 20px rgba(255, 215, 0, 1),
-              0 0 30px rgba(255, 215, 0, 0.8),
-              0 0 40px rgba(255, 215, 0, 0.6),
-              0 5px 0 #0b2a0b,
-              0 8px 0 #0b2a0b,
-              0 11px 0 #0b2a0b,
-              0 14px 0 #0b2a0b,
-              0 18px 25px rgba(0,0,0,0.9),
-              0 0 50px rgba(0, 255, 225, 0.5);
+        @media (min-width: 600px) {
+          .garden-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
           }
         }
 
         .mc-gradient {
           display: block;
-          font-family: 'Uncial Antiqua', cursive;
-          font-size: 1.2em;
-          letter-spacing: 0.05em;
+          font-family: 'Minecraft', 'Uncial Antiqua', cursive;
+          font-size: 1.1em;
+          letter-spacing: 0.03em;
+          margin-top: 0.3em;
           background: linear-gradient(180deg,
-            #70ef80 0%,
-            #4fe760 15%,
-            #3bdc54 30%,
-            #2fa443 50%,
-            #956b3a 70%,
-            #7d5832 85%,
-            #6b4b2a 100%);
+            #FFD700 0%,
+            #FFA500 25%,
+            #FF8C00 50%,
+            #FF6347 75%,
+            #DC143C 100%);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
           text-shadow:
-            0 2px 0 #174717,
-            0 4px 0 #164616,
-            0 6px 0 #144014,
-            0 8px 0 #113d11,
-            0 12px 16px rgba(0,0,0,0.9);
-          filter: drop-shadow(0 0 18px rgba(94, 255, 112, 0.5))
-                  drop-shadow(0 0 8px rgba(112, 239, 128, 0.4))
-                  brightness(1.08);
+            2px 2px 0 #3F3F3F,
+            3px 3px 0 #2F2F2F,
+            4px 4px 8px rgba(0,0,0,0.5);
+          filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6))
+                  brightness(1.1);
         }
       `}</style>
 
