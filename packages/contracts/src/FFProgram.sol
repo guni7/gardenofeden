@@ -3,11 +3,16 @@ pragma solidity >=0.8.30;
 
 import { System } from "@latticexyz/world/src/System.sol";
 import { WorldContextConsumer } from "@latticexyz/world/src/WorldContext.sol";
+import { WorldConsumer } from "@latticexyz/world-consumer/src/experimental/WorldConsumer.sol";
+import { defaultProgramSystem } from "@dust/programs/src/codegen/systems/DefaultProgramSystemLib.sol";
+
 
 import {
   HookContext,
   IAddFragment,
+  IAttachProgram,
   IBuild,
+  IDetachProgram,
   IEnergize,
   IHit,
   IMine,
@@ -18,13 +23,14 @@ import { EdenToken } from "./EdenToken.sol";
 
 import { FruitOfEden } from "./codegen/tables/FruitOfEden.sol";
 import { Admin } from "./codegen/tables/Admin.sol";
-import { BaseProgram } from "./BaseProgram.sol";
 
 import { EntityId } from "@dust/world/src/types/EntityId.sol";
 import { Constants } from "./Constants.sol";
 
 
 contract FFProgram is
+  IAttachProgram,
+  IDetachProgram,
   IProgramValidator,
   IEnergize,
   IHit,
@@ -33,7 +39,7 @@ contract FFProgram is
   IBuild,
   IMine,
   System,
-  BaseProgram
+  WorldConsumer(Constants.DUST_WORLD)
 {
 
   EdenToken public immutable TOKEN = EdenToken(Constants.EDEN_TOKEN_ADDRESS);
@@ -54,8 +60,29 @@ contract FFProgram is
   );
 
 
+  event AccessGroupSet(address sender, address msgsender, address ff, EntityId indexed forceField);
+
   function validateProgram(HookContext calldata ctx, IProgramValidator.ProgramData calldata) external view { }
   
+
+  function setAccessGroup() external {
+    EntityId forceField = EntityId.wrap(0x03000007fb00000042fffff7e500000000000000000000000000000000000000);
+    emit AccessGroupSet(_msgSender(), msg.sender, address(this), forceField);
+    require(Admin.get(_msgSender()), "Only admin can set access groups");
+    require(forceField.unwrap() != 0, "Force field not set yet");
+    defaultProgramSystem.setAccessGroup(forceField, _msgSender());
+  }
+
+  function onAttachProgram(HookContext calldata ctx) public view onlyWorld {
+    address player = ctx.caller.getPlayerAddress();
+    require(Admin.get(player), "Only admin can attach this program");
+  }
+
+  function onDetachProgram(HookContext calldata ctx) public view onlyWorld {
+    address player = ctx.caller.getPlayerAddress();
+    require(Admin.get(player), "Only admin can detach this program");
+  }
+
   function onEnergize(HookContext calldata ctx, IEnergize.EnergizeData calldata energize) external onlyWorld { 
     address player = ctx.caller.getPlayerAddress();
     require(player != address(0), "Invalid player address");
@@ -106,11 +133,15 @@ contract FFProgram is
   }
 
   // Required due to inheriting from System and WorldConsumer
-  function _msgSender() public view override(WorldContextConsumer, BaseProgram) returns (address) {
-    return BaseProgram._msgSender();
+  function _msgSender() public view override(WorldContextConsumer, WorldConsumer) returns (address) {
+    return WorldConsumer._msgSender();
   }
 
-  function _msgValue() public view override(WorldContextConsumer, BaseProgram) returns (uint256) {
-    return BaseProgram._msgValue();
+  function _msgValue() public view override(WorldContextConsumer, WorldConsumer) returns (uint256) {
+    return WorldConsumer._msgValue();
+  }
+
+  fallback() external {
+    revert("Hook not supported by forcefield");
   }
 }

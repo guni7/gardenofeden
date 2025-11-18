@@ -1,7 +1,67 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPublicClient, http, formatEther } from 'viem';
+import { redstone } from 'viem/chains';
+
+const EDEN_TOKEN_ADDRESS = '0xDE75849E2E500F57FA6f55116C531D0afFEf5E46';
+
+const ERC20_ABI = [
+  {
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
 
 export default function GardenOfEden() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [balance, setBalance] = useState<string>('0');
+  const [address, setAddress] = useState<string>('');
+
+  useEffect(() => {
+    // Fetch balance from connected wallet
+    const fetchBalance = async () => {
+      try {
+        // Check if ethereum provider exists
+        if (typeof window !== 'undefined' && (window as any).ethereum) {
+          const accounts = await (window as any).ethereum.request({
+            method: 'eth_accounts'
+          });
+
+          if (accounts && accounts.length > 0) {
+            const userAddress = accounts[0];
+            setAddress(userAddress);
+
+            // Create public client to read from contract
+            const client = createPublicClient({
+              chain: redstone,
+              transport: http('https://rpc.redstonechain.com'),
+            });
+
+            // Read balance
+            const bal = await client.readContract({
+              address: EDEN_TOKEN_ADDRESS,
+              abi: ERC20_ABI,
+              functionName: 'balanceOf',
+              args: [userAddress as `0x${string}`],
+            });
+
+            setBalance(formatEther(bal));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching balance:', error);
+      }
+    };
+
+    fetchBalance();
+
+    // Poll for balance updates every 5 seconds
+    const interval = setInterval(fetchBalance, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -215,6 +275,58 @@ export default function GardenOfEden() {
           filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6))
                   brightness(1.1);
         }
+
+        .balance-display {
+          position: absolute;
+          top: 2rem;
+          right: 2rem;
+          background: rgba(0, 0, 0, 0.7);
+          padding: 1rem 1.5rem;
+          border-radius: 8px;
+          border: 2px solid rgba(255, 215, 0, 0.3);
+          backdrop-filter: blur(10px);
+        }
+
+        .balance-label {
+          font-family: 'Minecraft', 'Cinzel', serif;
+          font-size: 0.75rem;
+          color: #FFD700;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          margin-bottom: 0.5rem;
+        }
+
+        .balance-amount {
+          font-family: 'Minecraft', 'Cinzel', serif;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #FFFFFF;
+          text-shadow: 2px 2px 0 #3F3F3F;
+          margin-bottom: 0.25rem;
+        }
+
+        .balance-address {
+          font-family: monospace;
+          font-size: 0.7rem;
+          color: rgba(255, 255, 255, 0.6);
+          text-align: center;
+        }
+
+        @media (max-width: 600px) {
+          .balance-display {
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+          }
+
+          .balance-label {
+            font-size: 0.65rem;
+          }
+
+          .balance-amount {
+            font-size: 1.2rem;
+          }
+        }
       `}</style>
 
       <canvas ref={canvasRef} className="garden-canvas" />
@@ -224,6 +336,13 @@ export default function GardenOfEden() {
           Welcome to the<br />
           <span className="mc-gradient">Garden of Eden</span>
         </h1>
+        {address && (
+          <div className="balance-display">
+            <div className="balance-label">EDEN Balance</div>
+            <div className="balance-amount">{parseFloat(balance).toFixed(2)} EDEN</div>
+            <div className="balance-address">{address.slice(0, 6)}...{address.slice(-4)}</div>
+          </div>
+        )}
       </div>
     </div>
   );

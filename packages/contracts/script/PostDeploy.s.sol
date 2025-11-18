@@ -10,16 +10,24 @@ import { bedProgram } from "../src/codegen/systems/BedProgramLib.sol";
 import { fFProgram } from "../src/codegen/systems/FFProgramLib.sol";
 import { spawnTileProgram } from "../src/codegen/systems/SpawnTileProgramLib.sol";
 import { Admin } from "../src/codegen/tables/Admin.sol";
+import { Systems } from "@latticexyz/world/src/codegen/tables/Systems.sol";
 
 contract PostDeploy is Script {
   function run(address worldAddress) external {
     StoreSwitch.setStoreAddress(worldAddress);
-    startBroadcast();
+    address sender = startBroadcast();
 
     // Set the admin address
     address admin = 0xD6756447ea6325b90917f604324B52ccfd6a1e0a;
     Admin.set(admin, true);
     console.log("Set admin address:", admin);
+
+    console.log("Setting admin", sender);
+    Admin.set(sender, true);
+
+    //(address programAddress, ) = Systems.get(fFProgram.toResourceId());
+    //(bool success, ) = programAddress.call(abi.encodeWithSignature("setAccessGroup()"));
+    //require(success, "setAccessGroup() failed");
 
     vm.stopBroadcast();
 
