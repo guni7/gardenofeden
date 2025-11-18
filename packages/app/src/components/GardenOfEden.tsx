@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPublicClient, http, formatEther } from 'viem';
 import { redstone } from 'viem/chains';
+import { useDustClient } from '../common/useDustClient';
 
 const EDEN_TOKEN_ADDRESS = '0xDE75849E2E500F57FA6f55116C531D0afFEf5E46';
 
@@ -18,38 +19,36 @@ export default function GardenOfEden() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [balance, setBalance] = useState<string>('0');
   const [address, setAddress] = useState<string>('');
+  const { data: dustClient } = useDustClient();
 
   useEffect(() => {
-    // Fetch balance from connected wallet
+    // Fetch balance from DUST world
     const fetchBalance = async () => {
       try {
-        // Check if ethereum provider exists
-        if (typeof window !== 'undefined' && (window as any).ethereum) {
-          const accounts = await (window as any).ethereum.request({
-            method: 'eth_accounts'
-          });
+        if (!dustClient) return;
 
-          if (accounts && accounts.length > 0) {
-            const userAddress = accounts[0];
-            setAddress(userAddress);
+        // Get player address from DUST world
+        const playerAddress = dustClient.appContext.userAddress;
 
-            // Create public client to read from contract
-            const client = createPublicClient({
-              chain: redstone,
-              transport: http('https://rpc.redstonechain.com'),
-            });
+        if (!playerAddress) return;
 
-            // Read balance
-            const bal = await client.readContract({
-              address: EDEN_TOKEN_ADDRESS,
-              abi: ERC20_ABI,
-              functionName: 'balanceOf',
-              args: [userAddress as `0x${string}`],
-            });
+        setAddress(playerAddress);
 
-            setBalance(formatEther(bal));
-          }
-        }
+        // Create public client to read from contract
+        const client = createPublicClient({
+          chain: redstone,
+          transport: http('https://rpc.redstonechain.com'),
+        });
+
+        // Read balance
+        const bal = await client.readContract({
+          address: EDEN_TOKEN_ADDRESS,
+          abi: ERC20_ABI,
+          functionName: 'balanceOf',
+          args: [playerAddress],
+        });
+
+        setBalance(formatEther(bal));
       } catch (error) {
         console.error('Error fetching balance:', error);
       }
@@ -61,7 +60,7 @@ export default function GardenOfEden() {
     const interval = setInterval(fetchBalance, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [dustClient]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
