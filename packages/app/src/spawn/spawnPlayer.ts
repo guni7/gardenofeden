@@ -4,10 +4,9 @@ import { resourceToHex } from "@latticexyz/common";
 import { SPAWN_ENERGY, SPAWN_TILE_ENTITY_ID } from "./constants";
 import { getSpawnCoord } from "./getSpawnCoord";
 import { decodeError } from "../common/decodeError";
-import type { DustClient } from "dustkit/internal";
 
 export async function spawnPlayer(
-  dustClient: DustClient
+  dustClient: Awaited<ReturnType<typeof import("dustkit/internal").connectDustClient>>
 ): Promise<{ error?: string }> {
   const spawnTileCoord = decodePosition(SPAWN_TILE_ENTITY_ID);
   const spawnCoord = packVec3(getSpawnCoord(spawnTileCoord));
