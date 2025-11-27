@@ -17,7 +17,7 @@ export async function spawnPlayer(
       {
         systemId: resourceToHex({
           type: "system",
-          namespace: "",
+          namespace: "GardenOfEden",
           name: "SpawnSystem",
         }),
         abi: IWorldAbi,
