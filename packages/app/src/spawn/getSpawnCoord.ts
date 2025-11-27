@@ -5,7 +5,8 @@ export function getSpawnCoord(
 ): [number, number, number] {
   const dx = Math.round(Math.random() * (SPAWN_RADIUS * 2)) - SPAWN_RADIUS;
   const dz = Math.round(Math.random() * (SPAWN_RADIUS * 2)) - SPAWN_RADIUS;
-  const dy = dx === 0 && dz === 0 ? 1 : 0;
+  // Always spawn 2 blocks above the spawn tile to ensure spawning in air
+  const dy = 2;
   return [
     spawnTileCoord[0] + dx,
     spawnTileCoord[1] + dy,
