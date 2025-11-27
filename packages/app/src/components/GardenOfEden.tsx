@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPublicClient, http, formatEther } from 'viem';
 import { redstone } from 'viem/chains';
 import { useDustClient } from '../common/useDustClient';
+import { spawnPlayer } from '../spawn';
 
 const EDEN_TOKEN_ADDRESS = '0xDE75849E2E500F57FA6f55116C531D0afFEf5E46';
 
@@ -19,6 +20,8 @@ export default function GardenOfEden() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [balance, setBalance] = useState<string>('0');
   const [address, setAddress] = useState<string>('');
+  const [spawnError, setSpawnError] = useState<string | undefined>(undefined);
+  const [isSpawning, setIsSpawning] = useState(false);
   const { data: dustClient } = useDustClient();
 
   useEffect(() => {
@@ -204,6 +207,22 @@ export default function GardenOfEden() {
     };
   }, []);
 
+  const handleSpawn = async () => {
+    if (!dustClient) return;
+
+    setSpawnError(undefined);
+    setIsSpawning(true);
+
+    try {
+      const { error } = await spawnPlayer(dustClient);
+      setSpawnError(error);
+    } catch (err) {
+      setSpawnError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsSpawning(false);
+    }
+  };
+
   return (
     <div className="relative w-full h-screen overflow-hidden">
       <style>{`
@@ -311,6 +330,52 @@ export default function GardenOfEden() {
           text-align: center;
         }
 
+        .spawn-button {
+          font-family: 'Minecraft', 'Cinzel', serif;
+          font-weight: 700;
+          font-size: 1.2rem;
+          padding: 1rem 2rem;
+          margin-top: 2rem;
+          background: linear-gradient(180deg, #4CAF50 0%, #45a049 100%);
+          color: white;
+          border: 3px solid #2d5f2e;
+          border-radius: 8px;
+          cursor: pointer;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          text-shadow: 2px 2px 0 #2d5f2e;
+          box-shadow: 0 4px 0 #2d5f2e, 0 8px 20px rgba(0, 0, 0, 0.4);
+          transition: all 0.1s ease;
+        }
+
+        .spawn-button:hover:not(:disabled) {
+          background: linear-gradient(180deg, #5cb860 0%, #4CAF50 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 0 #2d5f2e, 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .spawn-button:active:not(:disabled) {
+          transform: translateY(2px);
+          box-shadow: 0 2px 0 #2d5f2e, 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .spawn-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .error-message {
+          font-family: 'Minecraft', 'Cinzel', serif;
+          color: #ff6b6b;
+          background: rgba(0, 0, 0, 0.8);
+          padding: 1rem 1.5rem;
+          border-radius: 8px;
+          border: 2px solid #ff6b6b;
+          margin-top: 1rem;
+          text-shadow: 1px 1px 0 #000;
+          max-width: 90%;
+        }
+
         @media (max-width: 600px) {
           .balance-display {
             top: 1rem;
@@ -325,16 +390,38 @@ export default function GardenOfEden() {
           .balance-amount {
             font-size: 1.2rem;
           }
+
+          .spawn-button {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+          }
         }
       `}</style>
 
       <canvas ref={canvasRef} className="garden-canvas" />
 
       <div className="garden-content">
-        <h1 className="garden-title">
-          Welcome to the<br />
-          <span className="mc-gradient">Garden of Eden</span>
-        </h1>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h1 className="garden-title">
+            Welcome to the<br />
+            <span className="mc-gradient">Garden of Eden</span>
+          </h1>
+
+          <button
+            className="spawn-button"
+            onClick={handleSpawn}
+            disabled={isSpawning || !dustClient}
+          >
+            {isSpawning ? 'Spawning...' : 'Spawn in Garden of Eden'}
+          </button>
+
+          {spawnError && (
+            <div className="error-message">
+              {spawnError}
+            </div>
+          )}
+        </div>
+
         {address && (
           <div className="balance-display">
             <div className="balance-label">EDEN Balance</div>

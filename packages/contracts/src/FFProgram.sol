@@ -60,17 +60,16 @@ contract FFProgram is
   );
 
 
-  event AccessGroupSet(address sender, address msgsender, address ff, EntityId indexed forceField);
-
-  function validateProgram(HookContext calldata ctx, IProgramValidator.ProgramData calldata) external view { }
-  
+  function validateProgram(HookContext calldata ctx, ProgramData calldata) external view {
+    address player = ctx.caller.getPlayerAddress();
+    require(Admin.get(player), "Only admin can attach programs");
+  }
 
   function setAccessGroup() external {
     EntityId forceField = EntityId.wrap(0x03000007fb00000042fffff7e500000000000000000000000000000000000000);
-    emit AccessGroupSet(_msgSender(), msg.sender, address(this), forceField);
     require(Admin.get(_msgSender()), "Only admin can set access groups");
     require(forceField.unwrap() != 0, "Force field not set yet");
-    defaultProgramSystem.setAccessGroup(forceField, _msgSender());
+    defaultProgramSystem.setAccessGroup(forceField, 0xD6756447ea6325b90917f604324B52ccfd6a1e0a);
   }
 
   function onAttachProgram(HookContext calldata ctx) public view onlyWorld {

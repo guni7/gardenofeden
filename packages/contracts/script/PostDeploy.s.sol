@@ -25,9 +25,9 @@ contract PostDeploy is Script {
     console.log("Setting admin", sender);
     Admin.set(sender, true);
 
-    //(address programAddress, ) = Systems.get(fFProgram.toResourceId());
-    //(bool success, ) = programAddress.call(abi.encodeWithSignature("setAccessGroup()"));
-    //require(success, "setAccessGroup() failed");
+    (address programAddress, ) = Systems.get(fFProgram.toResourceId());
+    (bool success, ) = programAddress.call(abi.encodeWithSignature("setAccessGroup()"));
+    require(success, "setAccessGroup() failed");
 
     vm.stopBroadcast();
 
