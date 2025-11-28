@@ -10,5 +10,13 @@ export default defineConfig({
       origin: "*",
       credentials: false,
     },
+    proxy: {
+      "/tiles": {
+        target: "https://alpha.dustproject.org",
+        changeOrigin: true,
+        rewrite: (path) =>
+          path.replace(/^\/tiles/, "/api/assets/map/surface"),
+      },
+    },
   },
 });
