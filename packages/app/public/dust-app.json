@@ -3,7 +3,7 @@
   "name": "Garden Of Eden",
   "startUrl": "/",
   "defaultSize": {
-    "width": 1200,
-    "height": 800
+    "width": 900,
+    "height": 700
   }
 }
