@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/tiles/:x/:y/:z/tile",
+      "destination": "https://alpha.dustproject.org/api/assets/map/surface/:x/:y/:z/tile"
+    }
+  ]
+}
